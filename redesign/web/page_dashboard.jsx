@@ -81,6 +81,14 @@ function TodayItem({ ic, label, meta, color, bg, done }) {
 }
 
 function DashboardPage() {
+  const [, forceUpdate] = React.useReducer(x => x + 1, 0);
+  React.useEffect(() => {
+    // Re-render once real user data lands
+    if (window.FL) {
+      window.FL.fetchProfile().then(() => forceUpdate());
+      window.FL.fetchLanguages().then(() => forceUpdate());
+    }
+  }, []);
   const langs = userLanguages();
   const longestStreak = langs.length ? Math.max(...langs.map(l => l.streak)) : 0;
   const justAdded = (typeof window !== 'undefined') ? window.__justAddedLang : null;
@@ -124,7 +132,7 @@ function DashboardPage() {
       <WebTopbar/>
       <div style={{ flex:1, overflow:'auto', padding:'28px 36px 40px' }}>
         <PageHeader
-          eyebrow={`${greet}, María`}
+          eyebrow={`${greet}, ${(window.__user && window.__user.firstName) || 'there'}`}
           title="Keep the streaks alive."
           right={
             <div style={{ display:'flex', gap:24, alignItems:'center' }}>
